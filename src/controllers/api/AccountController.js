@@ -9,6 +9,7 @@ import http from 'node:http'
 import { logger } from '../../config/winston.js'
 import { JsonWebToken } from '../../lib/JsonWebtoken.js'
 import { UserModel } from '../../models/UserModel.js'
+import fs from 'fs-extra'
 
 /**
  * Encapsulates a controller.
@@ -28,12 +29,15 @@ export class AccountController {
       const userDocument = await UserModel.authenticate(req.body.username, req.body.password)
       const user = userDocument.toObject()
 
+      // read private key and assign it to variable
+      const privateKey = fs.readFileSync('private.pem', 'utf8')
+      process.env.ACCESS_TOKEN_SECRET = privateKey
+      console.log('private key set as env')
       // Create the access token with the shorter lifespan.
       const accessToken = await JsonWebToken.encodeUser(user,
         process.env.ACCESS_TOKEN_SECRET,
         process.env.ACCESS_TOKEN_LIFE
       )
-
 
       logger.silly('Authenticated user', { user })
 

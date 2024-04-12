@@ -18,9 +18,7 @@ import { logger } from './config/winston.js'
 import { router } from './routes/router.js'
 import dotenv from 'dotenv'
 
-
 try {
-  
   dotenv.config()
   // Connect to MongoDB.
   await connectToDatabase(process.env.DB_CONNECTION_STRING)

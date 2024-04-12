@@ -178,6 +178,8 @@ ehthumbs_vista.db
 # Dump file
 *.stackdump
 
+private.pem
+
 # Folder config file
 [Dd]esktop.ini
 
