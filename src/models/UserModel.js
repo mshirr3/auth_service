@@ -62,14 +62,17 @@ schema.pre('save', async function () {
  *
  * @param {string} username - The username.
  * @param {string} password - The password.
+ * @param {Function} next - Express next middleware function.
  * @returns {Promise<UserModel>} A promise that resolves with the user if authentication was successful.
  */
-schema.statics.authenticate = async function (username, password) {
+schema.statics.authenticate = async function (username, password, next) {
   const userDocument = await this.findOne({ username })
 
   // If no user found or password is wrong, throw an error.
   if (!userDocument || !(await bcrypt.compare(password, userDocument?.password))) {
-    throw new Error('Invalid credentials.')
+    const error = new Error('Credentials invalid or not provided')
+    error.status = 401
+    next(error)
   }
 
   // User found and password correct, return the user.

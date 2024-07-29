@@ -26,7 +26,7 @@ export class AccountController {
     try {
       logger.silly('Authenticating user', { body: req.body })
 
-      const userDocument = await UserModel.authenticate(req.body.username, req.body.password)
+      const userDocument = await UserModel.authenticate(req.body.username, req.body.password, next)
       const user = userDocument.toObject()
 
       // read private key and assign it to variable
@@ -47,13 +47,7 @@ export class AccountController {
           access_token: accessToken
         })
     } catch (error) {
-      // Authentication failed.
-      const httpStatusCode = 401
-      const err = new Error(http.STATUS_CODES[httpStatusCode])
-      err.status = httpStatusCode
-      err.cause = error
-
-      next(err)
+      next(error)
     }
   }
 
