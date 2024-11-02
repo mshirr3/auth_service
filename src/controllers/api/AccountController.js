@@ -15,6 +15,12 @@ import fs from 'fs-extra'
  * Encapsulates a controller.
  */
 export class AccountController {
+  #accessToken
+
+  constructor () {
+    this.#accessToken = fs.readFileSync('private.pem', 'utf8')
+  }
+
   /**
    * Authenticates a user.
    *
@@ -28,23 +34,22 @@ export class AccountController {
 
       const userDocument = await UserModel.authenticate(req.body.username, req.body.password, next)
       const user = userDocument.toObject()
-
-      // read private key and assign it to variable
-      const privateKey = fs.readFileSync('private.pem', 'utf8')
-      process.env.ACCESS_TOKEN_SECRET = privateKey
+      console.log(user)
+      console.log(process.env.ACCESS_TOKEN_LIFE)
       console.log('private key set as env')
       // Create the access token with the shorter lifespan.
       const accessToken = await JsonWebToken.encodeUser(user,
-        process.env.ACCESS_TOKEN_SECRET,
+        this.#accessToken,
         process.env.ACCESS_TOKEN_LIFE
       )
 
       logger.silly('Authenticated user', { user })
 
       res
+        .cookie('token', accessToken) // send as cookie
         .status(201)
         .json({
-          access_token: accessToken
+          message: 'Login successful'
         })
     } catch (error) {
       next(error)
@@ -62,26 +67,31 @@ export class AccountController {
     try {
       logger.silly('Creating new user document', { body: req.body })
 
-      const { username, password, firstName, lastName, email } = req.body
+      const { username, password } = req.body
+
+      // Validate input
+      if (!username || !password) {
+        const error = new Error('Username and password are required')
+        error.status = 400 // Bad request
+        throw error
+      }
+
+      if (password.length < 5) {
+        const error = new Error('The password must be at least 5 characters long')
+        error.status = 400
+        throw error
+      }
 
       const userDocument = await UserModel.create({
         username,
-        password,
-        firstName,
-        lastName,
-        email
+        password
       })
 
       logger.silly('Created new user document')
 
-      const location = new URL(
-        `${req.protocol}://${req.get('host')}${req.baseUrl}/${userDocument.id}`
-      )
-
       res
-        .location(location.href)
         .status(201)
-        .json({ id: userDocument.id })
+        .json({ message: 'User created successfully', id: userDocument.id })
     } catch (error) {
       let httpStatusCode = 500
 

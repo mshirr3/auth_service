@@ -26,6 +26,7 @@ export class JsonWebToken {
           return
         }
 
+        console.log(decoded)
         const user = {
           id: decoded.sub,
           firstName: decoded.firstName,

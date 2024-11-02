@@ -31,7 +31,7 @@ try {
   app.use(helmet())
 
   // Enable Cross Origin Resource Sharing (CORS) (https://www.npmjs.com/package/cors).
-  app.use(cors())
+  app.use(cors({ credentials: true, origin: process.env.DV613_CLIENT }))
 
   // Parse requests of the content type application/json.
   app.use(express.json())
@@ -60,6 +60,18 @@ try {
   // Error handler.
   app.use((err, req, res, next) => {
     logger.error(err.message, { error: err })
+
+    // client side errors
+    if (err.status === 400) {
+      res
+        .status(err.status)
+        .json({
+          status: err.status,
+          message: err.message
+        })
+
+      return
+    }
 
     if (process.env.NODE_ENV === 'production') {
       // Ensure a valid status code is set for the error.

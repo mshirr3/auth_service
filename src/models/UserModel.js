@@ -7,31 +7,10 @@
 
 import bcrypt from 'bcrypt'
 import mongoose from 'mongoose'
-import validator from 'validator'
 import { BASE_SCHEMA } from './baseSchema.js'
-
-const { isEmail } = validator
 
 // Create a schema.
 const schema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: [true, 'First name is required.'],
-    trim: true
-  },
-  lastName: {
-    type: String,
-    required: [true, 'Last name is required.'],
-    trim: true
-  },
-  email: {
-    type: String,
-    required: [true, 'Email address is required.'],
-    unique: true,
-    lowercase: true,
-    trim: true,
-    validate: [isEmail, 'Please provide a valid email address.']
-  },
   username: {
     type: String,
     required: [true, 'Username is required.'],
@@ -60,7 +39,7 @@ schema.pre('save', async function () {
 /**
  * Authenticates a user.
  *
- * @param {string} username - The username.
+ * @param {string} username -
  * @param {string} password - The password.
  * @param {Function} next - Express next middleware function.
  * @returns {Promise<UserModel>} A promise that resolves with the user if authentication was successful.
@@ -72,7 +51,7 @@ schema.statics.authenticate = async function (username, password, next) {
   if (!userDocument || !(await bcrypt.compare(password, userDocument?.password))) {
     const error = new Error('Credentials invalid or not provided')
     error.status = 401
-    next(error)
+    throw error
   }
 
   // User found and password correct, return the user.
