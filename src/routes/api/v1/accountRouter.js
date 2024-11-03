@@ -21,3 +21,5 @@ router.post('/login', (req, res, next) => controller.login(req, res, next))
 router.post('/register', (req, res, next) => controller.register(req, res, next))
 
 router.get('/userInfo', (req, res, next) => controller.userInfo(req, res, next))
+
+router.post('/logout', (req, res, next) => controller.logout(req, res, next))

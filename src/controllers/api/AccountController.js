@@ -10,6 +10,7 @@ import { logger } from '../../config/winston.js'
 import { JsonWebToken } from '../../lib/JsonWebtoken.js'
 import { UserModel } from '../../models/UserModel.js'
 import fs from 'fs-extra'
+import jwt from 'jsonwebtoken'
 
 /**
  * Encapsulates a controller.
@@ -23,10 +24,13 @@ export class AccountController {
 
   async userInfo (req, res, next) {
     const secret = 'djsakhduh28'
-    const { jwt } = req.cookies
-    const user = await JsonWebToken.decodeUser(jwt, secret)
+    const { token } = req.cookies
+    // const user = await JsonWebToken.decodeUser(jwt, secret)
 
-    res.status(200).json(user)
+    jwt.verify(token, secret, {}, (err, info) => {
+      if (err) throw err
+      res.status(200).json(info)
+    })
   }
 
   /**
@@ -52,7 +56,7 @@ export class AccountController {
 
       logger.silly('Authenticated user', { user })
 
-      res.cookie('jwt', accessToken, {
+      res.cookie('token', accessToken, {
         httpOnly: true, // Prevents JavaScript access
         secure: true, // Use true if serving over HTTPS
         sameSite: 'Strict', // Helps prevent CSRF attacks
@@ -67,6 +71,10 @@ export class AccountController {
     } catch (error) {
       next(error)
     }
+  }
+
+  logout (req, res, next) {
+    res.cookie('token', '').json('ok')
   }
 
   /**
