@@ -64,7 +64,6 @@ export class JsonWebToken {
         payload,
         secret,
         {
-          algorithm: 'RS256',
           expiresIn
         },
         (error, token) => {

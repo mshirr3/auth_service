@@ -20,4 +20,4 @@ router.post('/login', (req, res, next) => controller.login(req, res, next))
 // Register
 router.post('/register', (req, res, next) => controller.register(req, res, next))
 
-router.post('/user', (req, res, next) => controller.userInfo(req, res, next))
+router.get('/userInfo', (req, res, next) => controller.userInfo(req, res, next))

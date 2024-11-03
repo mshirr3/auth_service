@@ -17,6 +17,7 @@ import { morganLogger } from './config/morgan.js'
 import { logger } from './config/winston.js'
 import { router } from './routes/router.js'
 import dotenv from 'dotenv'
+import cookieParser from 'cookie-parser'
 
 try {
   dotenv.config()
@@ -29,6 +30,8 @@ try {
 
   // Set various HTTP headers to make the application little more secure (https://www.npmjs.com/package/helmet).
   app.use(helmet())
+
+  app.use(cookieParser())
 
   // Enable Cross Origin Resource Sharing (CORS) (https://www.npmjs.com/package/cors).
   app.use(cors({ credentials: true, origin: process.env.DV613_CLIENT }))

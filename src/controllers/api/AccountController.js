@@ -21,11 +21,13 @@ export class AccountController {
     this.#accessToken = fs.readFileSync('private.pem', 'utf8')
   }
 
-  // async userInfo (req, res, next) {
-  //   const {jwt} = req.cookies
-  //   await JsonWebToken.decodeUser(jwt,)
+  async userInfo (req, res, next) {
+    const secret = 'djsakhduh28'
+    const { jwt } = req.cookies
+    const user = await JsonWebToken.decodeUser(jwt, secret)
 
-  // }
+    res.status(200).json(user)
+  }
 
   /**
    * Authenticates a user.
@@ -36,6 +38,7 @@ export class AccountController {
    */
   async login (req, res, next) {
     try {
+      const secret = 'djsakhduh28'
       logger.silly('Authenticating user', { body: req.body })
 
       const userDocument = await UserModel.authenticate(req.body.username, req.body.password, next)
@@ -43,8 +46,8 @@ export class AccountController {
 
       // Create the access token with the shorter lifespan.
       const accessToken = await JsonWebToken.encodeUser(user,
-        this.#accessToken,
-        process.env.ACCESS_TOKEN_LIFE
+        secret,
+        86400000
       )
 
       logger.silly('Authenticated user', { user })
@@ -53,7 +56,7 @@ export class AccountController {
         httpOnly: true, // Prevents JavaScript access
         secure: true, // Use true if serving over HTTPS
         sameSite: 'Strict', // Helps prevent CSRF attacks
-        maxAge: 86400000 // Cookie expiration in milliseconds (1 hour)
+        maxAge: 86400000 // Cookie expiration in milliseconds (1 day)
       })
 
       res
