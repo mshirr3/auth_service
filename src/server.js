@@ -22,8 +22,8 @@ import cookieParser from 'cookie-parser'
 try {
   dotenv.config()
   // Connect to MongoDB.
-  await connectToDatabase(process.env.DB_CONNECTION_STRING)
-  const port = process.env.PORT || 3000
+  await connectToDatabase('mongodb+srv://mohameddshire:QKHqiQA74W6cHcwo@doubles.sifg0.mongodb.net/?retryWrites=true&w=majority&appName=DoubleS')
+  const port = 3200 || 3000
 
   // Create an Express application.
   const app = express()
@@ -34,7 +34,7 @@ try {
   app.use(cookieParser())
 
   // Enable Cross Origin Resource Sharing (CORS) (https://www.npmjs.com/package/cors).
-  app.use(cors({ credentials: true, origin: process.env.DV613_CLIENT }))
+  app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
 
   // Parse requests of the content type application/json.
   app.use(express.json())
