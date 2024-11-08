@@ -16,12 +16,6 @@ import jwt from 'jsonwebtoken'
  * Encapsulates a controller.
  */
 export class AccountController {
-  #accessToken
-
-  constructor () {
-    this.#accessToken = fs.readFileSync('private.pem', 'utf8')
-  }
-
   async userInfo (req, res, next) {
     const secret = 'djsakhduh28'
     const { token } = req.cookies
